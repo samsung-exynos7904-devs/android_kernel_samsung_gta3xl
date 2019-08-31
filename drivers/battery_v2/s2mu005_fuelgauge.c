@@ -2100,7 +2100,7 @@ static int s2mu005_fg_set_property(struct power_supply *psy,
 #endif
 		case POWER_SUPPLY_PROP_MAX ... POWER_SUPPLY_EXT_PROP_MAX:
 			{
-				enum power_supply_ext_property ext_psp = psp;
+				enum power_supply_ext_property ext_psp = (enum power_supply_ext_property) psp;
 				u8 temp = 0;
 				switch (ext_psp) {
 				case POWER_SUPPLY_EXT_PROP_INBAT_VOLTAGE_FGSRC_SWITCHING:
