@@ -1,7 +1,16 @@
 # SPDX-License-Identifier: GPL-2.0
-dtb-y += exynos/dtbo/exynos7885.dtb
-dtbo-y += exynos/dtbo/exynos7904-gta3xlwifi_eur_open_03.dtbo
-dtbo-y += exynos/dtbo/exynos7904-gta3xlwifi_eur_open_04.dtbo
+dtb-y += exynos/exynos7885.dtb
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_eur_open_00.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_eur_open_01.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_eur_open_02.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_eur_open_03.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_eur_open_04.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_kor_single_03.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_kor_single_04.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xl_usa_spr_04.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xlwifi_eur_open_00.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xlwifi_eur_open_03.dts
+dtbo-y += exynos/dtbo/exynos7904-gta3xlwifi_eur_open_04.dts
 
 targets += dtbs
 DTB_LIST  := $(dtb-y) $(dtbo-y)
