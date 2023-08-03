@@ -623,9 +623,9 @@ static ssize_t pressure_enable_show(struct device *dev,
 	char buff[256] = { 0 };
 
 	if (info->lowpower_flag & FTS_MODE_PRESSURE)
-		snprintf(buff, sizeof(buff), "1");
+		snprintf(buff, strlen(buff) , "1");
 	else
-		snprintf(buff, sizeof(buff), "0");
+		snprintf(buff, strlen(buff) , "0");
 
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 
@@ -680,7 +680,7 @@ static ssize_t read_support_feature(struct device *dev,
 	if (info->board->support_aot)
 		feature |= INPUT_FEATURE_SUPPORT_AOT;
 
-	snprintf(buff, sizeof(buff), "%d", feature);
+	snprintf(buff, strlen(buff) , "%d", feature);
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 
 	return snprintf(buf, SEC_CMD_BUF_SIZE, "%s\n", buff);
@@ -768,11 +768,11 @@ static ssize_t get_lp_dump(struct device *dev, struct device_attribute *attr, ch
 
 		if (data0 || data1 || data2 || data3 || data4) {
 			if (dump_format == 10) {
-				snprintf(buff, sizeof(buff),
+				snprintf(buff, strlen(buff) ,
 						"%d: %04x%04x%04x%04x%04x\n",
 						string_addr, data0, data1, data2, data3, data4);
 			} else {
-				snprintf(buff, sizeof(buff),
+				snprintf(buff, strlen(buff) ,
 						"%d: %04x%04x%04x%04x\n",
 						string_addr, data0, data1, data2, data3);
 			}
@@ -963,11 +963,11 @@ static ssize_t fts_get_cmoffset_dump(struct fts_ts_info *info, char *buf, u8 pos
 	for (i = 0; i < info->ForceChannelLength; i++) {
 		char buff[4] = { 0 };
 		for (j = 0; j < info->SenseChannelLength; j++) {
-			snprintf(buff, sizeof(buff), " %d", rbuff[i * info->SenseChannelLength + j]);
-			strncat(buf, buff, sizeof(buff));
+			snprintf(buff, strlen(buff) , " %d", rbuff[i * info->SenseChannelLength + j]);
+			strncat(buf, buff, strlen(buff) );
 		}
-		snprintf(buff, sizeof(buff), "\n");
-		strncat(buf, buff, sizeof(buff));
+		snprintf(buff, strlen(buff) , "\n");
+		strncat(buf, buff, strlen(buff) );
 	}
 
 out:
@@ -1014,8 +1014,8 @@ static int fts_check_index(struct fts_ts_info *info)
 			|| sec->cmd_param[1] < 0
 			|| sec->cmd_param[1] >= info->ForceChannelLength) {
 
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		input_err(true, &info->client->dev, "%s: parameter error: %u,%u\n",
 				__func__, sec->cmd_param[0], sec->cmd_param[1]);
@@ -1036,7 +1036,7 @@ static ssize_t fts_scrub_position(struct device *dev,
 
 	input_info(true, &info->client->dev, "%s: %d %d %d\n",
 			__func__, info->scrub_id, info->scrub_x, info->scrub_y);
-	snprintf(buff, sizeof(buff), "%d %d %d", info->scrub_id, info->scrub_x, info->scrub_y);
+	snprintf(buff, strlen(buff) , "%d %d %d", info->scrub_id, info->scrub_x, info->scrub_y);
 
 	info->scrub_x = 0;
 	info->scrub_y = 0;
@@ -1051,7 +1051,7 @@ static void tui_mode_cmd(struct fts_ts_info *info)
 	char buff[16] = "TUImode:FAIL";
 
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 	sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 	sec_cmd_set_cmd_exit(sec);
@@ -1067,8 +1067,8 @@ static void not_support_cmd(void *device_data)
 	char buff[16] = { 0 };
 
 	sec_cmd_set_default_result(sec);
-	snprintf(buff, sizeof(buff), "%s", "NA");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%s", "NA");
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 	sec_cmd_set_cmd_exit(sec);
 
@@ -1085,8 +1085,8 @@ static void fw_update(void *device_data)
 	sec_cmd_set_default_result(sec);
 #if defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
 	if (sec->cmd_param[0] == 1) {
-		snprintf(buff, sizeof(buff), "%s", "OK");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "OK");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 		input_info(true, &info->client->dev, "%s: user_ship, success\n", __func__);
 		return;
@@ -1096,8 +1096,8 @@ static void fw_update(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -1105,13 +1105,13 @@ static void fw_update(void *device_data)
 	retval = fts_fw_update_on_hidden_menu(info, sec->cmd_param[0]);
 
 	if (retval < 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		input_err(true, &info->client->dev, "%s: failed [%d]\n", __func__, retval);
 	} else {
-		snprintf(buff, sizeof(buff), "%s", "OK");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "OK");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 		input_info(true, &info->client->dev, "%s: success [%d]\n", __func__, retval);
 	}
@@ -1320,13 +1320,13 @@ void fts_get_sec_ito_test_result(struct fts_ts_info *info)
 	memcpy(result, &data[2], length - 2);
 	memset(info->ito_result, 0x00, FTS_ITO_RESULT_PRINT_SIZE);
 
-	snprintf(buff, sizeof(buff), "%s: test count - sub:%d, main:%d\n", __func__, data[0], data[1]);
+	snprintf(buff, strlen(buff) , "%s: test count - sub:%d, main:%d\n", __func__, data[0], data[1]);
 	input_info(true, &info->client->dev, "%s", buff);
-	strncat(info->ito_result, buff, sizeof(buff));
+	strncat(info->ito_result, buff, strlen(buff) );
 
-	snprintf(buff, sizeof(buff), "ITO:              /   TX_GAP_MAX   /   RX_GAP_MAX\n");
+	snprintf(buff, strlen(buff) , "ITO:              /   TX_GAP_MAX   /   RX_GAP_MAX\n");
 	input_info(true, &info->client->dev, "%s", buff);
-	strncat(info->ito_result, buff, sizeof(buff));
+	strncat(info->ito_result, buff, strlen(buff) );
 
 	for (i = 0; i < 10; i++) {
 		switch (result[i].flag) {
@@ -1342,14 +1342,14 @@ void fts_get_sec_ito_test_result(struct fts_ts_info *info)
 			break;
 		}
 
-		snprintf(buff, sizeof(buff), "ITO: [%3d] %d-%s / Tx%02d,Rx%02d: %3d / Tx%02d,Rx%02d: %3d\n",
+		snprintf(buff, strlen(buff) , "ITO: [%3d] %d-%s / Tx%02d,Rx%02d: %3d / Tx%02d,Rx%02d: %3d\n",
 				result[i].num_of_test, result[i].flag, pos_buf,
 				result[i].tx_of_txmax_gap, result[i].rx_of_txmax_gap,
 				result[i].max_of_tx_gap,
 				result[i].tx_of_rxmax_gap, result[i].rx_of_rxmax_gap,
 				result[i].max_of_rx_gap);
 		input_info(true, &info->client->dev, "%s", buff);
-		strncat(info->ito_result, buff, sizeof(buff));
+		strncat(info->ito_result, buff, strlen(buff) );
 
 		/* when count is over 200, it restart from 1 */
 		if (result[i].num_of_test > result[max_count].num_of_test + 100)
@@ -1369,14 +1369,14 @@ done:
 		return;
 
 	if (ret < 0) {
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_X");
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_Y");
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_X");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_Y");
 	} else {
-		snprintf(buff, sizeof(buff), "0,%d", result[max_count].max_of_rx_gap);
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_X");
-		snprintf(buff, sizeof(buff), "0,%d", result[max_count].max_of_tx_gap);
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_Y");
+		snprintf(buff, strlen(buff) , "0,%d", result[max_count].max_of_rx_gap);
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_X");
+		snprintf(buff, strlen(buff) , "0,%d", result[max_count].max_of_tx_gap);
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_Y");
 	}
 }
 
@@ -1431,9 +1431,9 @@ out:
 	if (sec->cmd_all_factory_state != SEC_CMD_STATUS_RUNNING)
 		return ret;
 
-	snprintf(buff, sizeof(buff), "NG");
-	sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_X");
-	sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CH_OPEN/SHORT_TEST_Y");
+	snprintf(buff, strlen(buff) , "NG");
+	sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_X");
+	sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CH_OPEN/SHORT_TEST_Y");
 	return ret;
 }
 
@@ -1662,10 +1662,10 @@ int fts_panel_ito_test(struct fts_ts_info *info, int testmode)
 
 	if (info->board->item_version == 2 && sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING) {
 		if (result < 0)
-			snprintf(buff, sizeof(buff), "%d", ITO_FAIL);
+			snprintf(buff, strlen(buff) , "%d", ITO_FAIL);
 		else
-			snprintf(buff, sizeof(buff), "%d", ITO_PASS);
-		sec_cmd_set_cmd_result_all(sec, buff, sizeof(buff), "CH_OPEN/SHORT_TEST");
+			snprintf(buff, strlen(buff) , "%d", ITO_PASS);
+		sec_cmd_set_cmd_result_all(sec, buff, strlen(buff) , "CH_OPEN/SHORT_TEST");
 	} else if (info->board->item_version > 2) {
 		if (fts_set_sec_ito_test_result(info) >= 0)
 			fts_get_sec_ito_test_result(info);
@@ -1726,12 +1726,12 @@ static void get_fw_ver_bin(void *device_data)
 
 	sec_cmd_set_default_result(sec);
 
-	snprintf(buff, sizeof(buff), "ST%02X%02X%04X",
+	snprintf(buff, strlen(buff) , "ST%02X%02X%04X",
 			0x00, 0x00, info->fw_main_version_of_bin);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_BIN");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "FW_VER_BIN");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1747,22 +1747,22 @@ static void get_fw_ver_ic(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_IC");
+			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "FW_VER_IC");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	fts_get_version_info(info);
 
-	snprintf(buff, sizeof(buff), "ST%02X%02X%04X",
+	snprintf(buff, strlen(buff) , "ST%02X%02X%04X",
 			0x00, 0x00, info->fw_main_version_of_ic);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "FW_VER_IC");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "FW_VER_IC");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1773,12 +1773,12 @@ static void get_config_ver(void *device_data)
 	struct fts_ts_info *info = container_of(sec, struct fts_ts_info, sec);
 	char buff[20] = { 0 };
 
-	snprintf(buff, sizeof(buff), "%s_ST_%04X",
+	snprintf(buff, strlen(buff) , "%s_ST_%04X",
 			info->board->model_name ?: info->board->project_name ?: "STM",
 			info->config_version_of_ic);
 
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1798,8 +1798,8 @@ static void get_threshold(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -1816,16 +1816,16 @@ static void get_threshold(void *device_data)
 	if (rc <= 0) {
 		input_err(true, &info->client->dev, "%s: Get threshold Read Fail!! [Data : %2X%2X]\n",
 				__func__, data[0], data[1]);
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
 
 	finger_threshold = (u16)(data[0] << 8 | data[1]);
 
-	snprintf(buff, sizeof(buff), "%d", finger_threshold);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", finger_threshold);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1840,12 +1840,12 @@ static void module_off_master(void *device_data)
 	ret = fts_stop_device(info, false);
 
 	if (ret == 0)
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 	else
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (strncmp(buff, "OK", 2) == 0)
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	else
@@ -1866,12 +1866,12 @@ static void module_on_master(void *device_data)
 		fts_stop_device(info, info->lowpower_flag);
 
 	if (ret == 0)
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 	else
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (strncmp(buff, "OK", 2) == 0)
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	else
@@ -1885,11 +1885,11 @@ static void get_chip_vendor(void *device_data)
 	struct fts_ts_info *info = container_of(sec, struct fts_ts_info, sec);
 	char buff[16] = { 0 };
 
-	strncpy(buff, "STM", sizeof(buff));
+	strncpy(buff, "STM", strlen(buff) );
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_VENDOR");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "IC_VENDOR");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1903,9 +1903,9 @@ static void get_chip_name(void *device_data)
 	memcpy(buff, info->firmware_name + 8, 9);
 
 	sec_cmd_set_default_result(sec);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "IC_NAME");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "IC_NAME");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1918,10 +1918,10 @@ static void get_mis_cal_info(void *device_data)
 
 	sec_cmd_set_default_result(sec);
 
-	snprintf(buff, sizeof(buff), "%d", info->miscal_result);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", info->miscal_result);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "MIS_CAL");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "MIS_CAL");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 	return;
@@ -1940,10 +1940,10 @@ static void get_wet_mode(void *device_data)
 
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n", __func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "WET_MODE");
+			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "WET_MODE");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -1953,18 +1953,18 @@ static void get_wet_mode(void *device_data)
 	ret = info->fts_read_reg(info, &regAdd[0], 2, &data[0], 1);
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read\n", __func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "WET_MODE");
+			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "WET_MODE");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
 
-	snprintf(buff, sizeof(buff), "%d", data[0]);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", data[0]);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "WET_MODE");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "WET_MODE");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1976,8 +1976,8 @@ static void get_x_num(void *device_data)
 	char buff[16] = { 0 };
 
 	sec_cmd_set_default_result(sec);
-	snprintf(buff, sizeof(buff), "%d", info->SenseChannelLength);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", info->SenseChannelLength);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -1989,8 +1989,8 @@ static void get_y_num(void *device_data)
 	char buff[16] = { 0 };
 
 	sec_cmd_set_default_result(sec);
-	snprintf(buff, sizeof(buff), "%d", info->ForceChannelLength);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", info->ForceChannelLength);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2007,8 +2007,8 @@ static void get_checksum_data(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2017,14 +2017,14 @@ static void get_checksum_data(void *device_data)
 	if (rc < 0) {
 		input_err(true, &info->client->dev, "%s: Get checksum data Read Fail!! [Data : %08X]\n",
 				__func__, checksum_data);
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
 
-	snprintf(buff, sizeof(buff), "%08X", checksum_data);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%08X", checksum_data);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2041,15 +2041,15 @@ static void run_reference_read(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	fts_read_frame(info, TYPE_BASELINE_DATA, &min, &max);
-	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d,%d", min, max);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2066,8 +2066,8 @@ static void get_reference(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2077,8 +2077,8 @@ static void get_reference(void *device_data)
 		return;
 
 	val = info->pFrame[node];
-	snprintf(buff, sizeof(buff), "%d", val);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", val);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2095,19 +2095,19 @@ static void run_rawcap_read(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "RAW_DATA");
+			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "RAW_DATA");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	fts_read_frame(info, TYPE_RAW_DATA, &min, &max);
-	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d,%d", min, max);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "RAW_DATA");
+		sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "RAW_DATA");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2126,8 +2126,8 @@ static void run_rawcap_read_all(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2135,8 +2135,8 @@ static void run_rawcap_read_all(void *device_data)
 	all_strbuff = kzalloc(info->ForceChannelLength * info->SenseChannelLength * 7 + 1, GFP_KERNEL);
 	if (!all_strbuff) {
 		input_err(true, &info->client->dev, "%s: alloc failed\n", __func__);
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -2145,8 +2145,8 @@ static void run_rawcap_read_all(void *device_data)
 	fts_read_frame(info, TYPE_RAW_DATA, &min, &max);
 	for (j = 0; j < info->ForceChannelLength; j++) {
 		for (i = 0; i < info->SenseChannelLength; i++) {
-			snprintf(buff, sizeof(buff), "%d,", info->pFrame[j * info->SenseChannelLength + i]);
-			strncat(all_strbuff, buff, sizeof(buff));
+			snprintf(buff, strlen(buff) , "%d,", info->pFrame[j * info->SenseChannelLength + i]);
+			strncat(all_strbuff, buff, strlen(buff) );
 		}
 	}
 	enter_factory_mode(info, false);
@@ -2169,8 +2169,8 @@ static void get_rawcap(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2180,8 +2180,8 @@ static void get_rawcap(void *device_data)
 		return;
 
 	val = info->pFrame[node];
-	snprintf(buff, sizeof(buff), "%d", val);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", val);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2198,15 +2198,15 @@ static void run_delta_read(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	fts_read_frame(info, TYPE_STRENGTH_DATA, &min, &max);
-	snprintf(buff, sizeof(buff), "%d,%d", min, max);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d,%d", min, max);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2225,8 +2225,8 @@ static void get_strength_all_data(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2234,8 +2234,8 @@ static void get_strength_all_data(void *device_data)
 	all_strbuff = kzalloc(info->ForceChannelLength * info->SenseChannelLength * 7 + 1, GFP_KERNEL);
 	if (!all_strbuff) {
 		input_err(true, &info->client->dev, "%s: alloc failed\n", __func__);
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -2244,8 +2244,8 @@ static void get_strength_all_data(void *device_data)
 
 	for (i = 0; i < info->ForceChannelLength; i++) {
 		for (j = 0; j < info->SenseChannelLength; j++) {
-			snprintf(buff, sizeof(buff), "%d,", info->pFrame[(i * info->SenseChannelLength) + j]);
-			strncat(all_strbuff, buff, sizeof(buff));
+			snprintf(buff, strlen(buff) , "%d,", info->pFrame[(i * info->SenseChannelLength) + j]);
+			strncat(all_strbuff, buff, strlen(buff) );
 		}
 	}
 
@@ -2269,8 +2269,8 @@ static void get_delta(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2280,8 +2280,8 @@ static void get_delta(void *device_data)
 		return;
 
 	val = info->pFrame[node];
-	snprintf(buff, sizeof(buff), "%d", val);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", val);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2296,7 +2296,7 @@ static void get_pat_information(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	/* fixed tune version will be saved at excute autotune */
-	snprintf(buff, sizeof(buff), "C%02XT%04X.%4s%s%c%d%c%d%c%d",
+	snprintf(buff, strlen(buff) , "C%02XT%04X.%4s%s%c%d%c%d%c%d",
 		info->tdata->nvdata.cal_count, info->tdata->nvdata.tune_fix_ver,
 		info->tdata->tclm_string[info->tdata->nvdata.cal_position].f_name,
 		(info->tdata->tclm_level == TCLM_LEVEL_LOCKDOWN) ? ".L " : " ",
@@ -2304,7 +2304,7 @@ static void get_pat_information(void *device_data)
 		info->tdata->cal_pos_hist_last3[2], info->tdata->cal_pos_hist_last3[3],
 		info->tdata->cal_pos_hist_last3[4], info->tdata->cal_pos_hist_last3[5]);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2318,9 +2318,9 @@ static void set_external_factory(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	info->tdata->external_factory = true;
-	snprintf(buff, sizeof(buff), "OK");
+	snprintf(buff, strlen(buff) , "OK");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -2361,7 +2361,7 @@ static void fts_read_ix_data(struct fts_ts_info *info, bool allnode)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
@@ -2387,7 +2387,7 @@ static void fts_read_ix_data(struct fts_ts_info *info, bool allnode)
 	info->fts_write_reg(info, &regAdd[0], 3);
 	rc = fts_fw_wait_for_echo_event(info, &regAdd[0], 3);
 	if (rc < 0) {
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -2401,7 +2401,7 @@ static void fts_read_ix_data(struct fts_ts_info *info, bool allnode)
 	info->fts_read_reg(info, &regAdd[0], 3, &data[0], FTS_COMP_DATA_HEADER_SIZE);
 
 	if ((data[0] != 0xA5) && (data[1] != dataID)) {
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -2500,10 +2500,10 @@ static void fts_read_ix_data(struct fts_ts_info *info, bool allnode)
 		return;
 	} else {
 		if (allnode == true) {
-			snprintf(buff, sizeof(buff), "%s", "kzalloc failed");
+			snprintf(buff, strlen(buff) , "%s", "kzalloc failed");
 			sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		} else {
-			snprintf(buff, sizeof(buff), "%d,%d,%d,%d",
+			snprintf(buff, strlen(buff) , "%d,%d,%d,%d",
 					min_tx_ix_sum, max_tx_ix_sum, min_rx_ix_sum, max_rx_ix_sum);
 			sec->cmd_state = SEC_CMD_STATUS_OK;
 		}
@@ -2517,7 +2517,7 @@ out:
 		snprintf(ret_buff, sizeof(ret_buff), "%d,%d", min_tx_ix_sum, max_tx_ix_sum);
 		sec_cmd_set_cmd_result_all(sec, ret_buff, strnlen(ret_buff, sizeof(ret_buff)), "IX_DATA_Y");
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -2569,7 +2569,7 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
@@ -2587,7 +2587,7 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 		ret = info->fts_read_reg(info, &regAdd[0], 3, &data[0], FTS_COMP_DATA_HEADER_SIZE);
 		if (ret <= 0) {
 			input_err(true, &info->client->dev, "%s: read failed rc = %d\n", __func__, ret);
-			snprintf(buff, sizeof(buff), "NG");
+			snprintf(buff, strlen(buff) , "NG");
 			sec->cmd_state = SEC_CMD_STATUS_FAIL;
 			goto out;
 		}
@@ -2603,7 +2603,7 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 	if (retry == 0) {
 		input_err(true, &info->client->dev, "%s: didn't match header or id. header = %02X, id = %02X\n",
 				__func__, pSyncFrameHeader->header, pSyncFrameHeader->host_data_mem_id);
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -2619,7 +2619,7 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 	ret = info->fts_read_reg(info, &regAdd[0], 3, &data[0], totalbytes);
 	if (ret <= 0) {
 		input_err(true, &info->client->dev, "%s: read failed rc = %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -2655,13 +2655,13 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 
 		memset(mbuff, 0x0, sizeof(mbuff));
 		for (i = 0; i < (info->ForceChannelLength); i++) {
-			snprintf(temp, sizeof(temp), "%d,", (s16)self_force_raw_data[i]);
-			strncat(mbuff, temp, sizeof(temp));
+			snprintf(temp, strlen(temp), "%d,", (s16)self_force_raw_data[i]);
+			strncat(mbuff, temp, strlen(temp));
 			input_info(true, &info->client->dev, "Force[%d] %d\n", i, (s16)self_force_raw_data[i]);
 		}
 		for (i = 0; i < (info->SenseChannelLength); i++) {
-			snprintf(temp, sizeof(temp), "%d,", (s16)self_sense_raw_data[i]);
-			strncat(mbuff, temp, sizeof(temp));
+			snprintf(temp, strlen(temp), "%d,", (s16)self_sense_raw_data[i]);
+			strncat(mbuff, temp, strlen(temp));
 			input_info(true, &info->client->dev, "Sense[%d] %d\n", i, (s16)self_sense_raw_data[i]);
 		}
 
@@ -2669,7 +2669,7 @@ static void fts_read_self_raw_frame(struct fts_ts_info *info, bool allnode)
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 		return;
 	} else {
-		snprintf(buff, sizeof(buff), "%d,%d,%d,%d",
+		snprintf(buff, strlen(buff) , "%d,%d,%d,%d",
 				(s16)min_tx_self_raw_data, (s16)max_tx_self_raw_data,
 				(s16)min_rx_self_raw_data, (s16)max_rx_self_raw_data);
 		sec->cmd_state = SEC_CMD_STATUS_OK;
@@ -2682,7 +2682,7 @@ out:
 		snprintf(ret_buff, sizeof(ret_buff), "%d,%d", (s16)min_tx_self_raw_data, (s16)max_tx_self_raw_data);
 		sec_cmd_set_cmd_result_all(sec, ret_buff, strnlen(ret_buff, sizeof(ret_buff)), "SELF_RAW_DATA_Y");
 	}
-	sec_cmd_set_cmd_result(sec, &buff[0], strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, &buff[0], strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -2718,8 +2718,8 @@ static void run_trx_short_test(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2728,15 +2728,15 @@ static void run_trx_short_test(void *device_data)
 
 	ret = fts_panel_ito_test(info, OPEN_SHORT_CRACK_TEST);
 	if (ret == 0) {
-		snprintf(buff, sizeof(buff), "OK");
+		snprintf(buff, strlen(buff) , "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 		sec_cmd_send_event_to_user(&info->sec, test, "RESULT=PASS");
 	} else {
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 		sec_cmd_send_event_to_user(&info->sec, test, "RESULT=FAIL");
 	}
@@ -2753,20 +2753,20 @@ static void check_connection(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	ret = fts_panel_ito_test(info, OPEN_TEST);
 	if (ret == 0)
-		snprintf(buff, sizeof(buff), "OK");
+		snprintf(buff, strlen(buff) , "OK");
 	else
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -2782,8 +2782,8 @@ static void get_cx_data(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2794,8 +2794,8 @@ static void get_cx_data(void *device_data)
 
 	if (info->cx_data)
 		val = info->cx_data[node];
-	snprintf(buff, sizeof(buff), "%d", val);
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%d", val);
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 
@@ -2892,10 +2892,10 @@ static void run_cx_data_read(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
-			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, sizeof(buff)), "CX_DATA");
+			sec_cmd_set_cmd_result_all(sec, buff, strnlen(buff, strlen(buff) ), "CX_DATA");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2904,18 +2904,18 @@ static void run_cx_data_read(void *device_data)
 
 	rc = read_ms_cx_data(info, &cx_min, &cx_max);
 	if (rc < 0) {
-		snprintf(buff, sizeof(buff), "NG");
+		snprintf(buff, strlen(buff) , "NG");
 		snprintf(buff_minmax, sizeof(buff_minmax), "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		snprintf(buff_minmax, sizeof(buff_minmax), "%d,%d", cx_min, cx_max);
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING)
 		sec_cmd_set_cmd_result_all(sec, buff_minmax, strnlen(buff_minmax, sizeof(buff_minmax)), "CX_DATA");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -2933,8 +2933,8 @@ static void get_cx_all_data(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -2951,8 +2951,8 @@ static void get_cx_all_data(void *device_data)
 	else
 		enter_factory_mode(info, false);
 	if (rc < 0) {
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -2960,8 +2960,8 @@ static void get_cx_all_data(void *device_data)
 	all_strbuff = kzalloc(info->ForceChannelLength * info->SenseChannelLength * 4 + 1, GFP_KERNEL);
 	if (!all_strbuff) {
 		input_err(true, &info->client->dev, "%s: alloc failed\n", __func__);
-		snprintf(buff, sizeof(buff), "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -2970,8 +2970,8 @@ static void get_cx_all_data(void *device_data)
 	if (info->cx_data) {
 		for (j = 0; j < info->ForceChannelLength; j++) {
 			for (i = 0; i < info->SenseChannelLength; i++) {
-				snprintf(buff, sizeof(buff), "%d,", info->cx_data[j * info->SenseChannelLength + i]);
-				strncat(all_strbuff, buff, sizeof(buff));
+				snprintf(buff, strlen(buff) , "%d,", info->cx_data[j * info->SenseChannelLength + i]);
+				strncat(all_strbuff, buff, strlen(buff) );
 			}
 		}
 	}
@@ -3002,9 +3002,9 @@ static void get_cx_gap_data(void *device_data)
 	input_raw_info(true, &info->client->dev, "%s: rx max:%d, tx max:%d\n", __func__, rx_max, tx_max);
 
 	if (sec->cmd_all_factory_state == SEC_CMD_STATUS_RUNNING) {
-		snprintf(buff, sizeof(buff), "%d,%d", 0, rx_max);
+		snprintf(buff, strlen(buff) , "%d,%d", 0, rx_max);
 		sec_cmd_set_cmd_result_all(sec, buff, SEC_CMD_STR_LEN, "CX_DATA_GAP_X");
-		snprintf(buff, sizeof(buff), "%d,%d", 0, tx_max);
+		snprintf(buff, strlen(buff) , "%d,%d", 0, tx_max);
 		sec_cmd_set_cmd_result_all(sec, buff, SEC_CMD_STR_LEN, "CX_DATA_GAP_Y");
 	}
 }
@@ -3021,16 +3021,16 @@ static void run_cx_gap_data_x_all(void *device_data)
 
 	buff = kzalloc(info->ForceChannelLength * info->SenseChannelLength * 5, GFP_KERNEL);
 	if (!buff) {
-		snprintf(temp, sizeof(temp), "NG");
-		sec_cmd_set_cmd_result(sec, temp, strnlen(temp, sizeof(temp)));
+		snprintf(temp, strlen(temp), "NG");
+		sec_cmd_set_cmd_result(sec, temp, strnlen(temp, strlen(temp)));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
 
 	for (ii = 0; ii < (info->SenseChannelLength * info->ForceChannelLength); ii++) {
 		if ((ii + 1) % (info->SenseChannelLength) != 0) {
-			snprintf(temp, sizeof(temp), "%d,", (int)abs(info->cx_data[ii + 1] - info->cx_data[ii]));
-			strncat(buff, temp, sizeof(temp));
+			snprintf(temp, strlen(temp), "%d,", (int)abs(info->cx_data[ii + 1] - info->cx_data[ii]));
+			strncat(buff, temp, strlen(temp));
 			memset(temp, 0x00, 5);
 		}
 	}
@@ -3052,17 +3052,17 @@ static void run_cx_gap_data_y_all(void *device_data)
 
 	buff = kzalloc(info->ForceChannelLength * info->SenseChannelLength * 5, GFP_KERNEL);
 	if (!buff) {
-		snprintf(temp, sizeof(temp), "NG");
-		sec_cmd_set_cmd_result(sec, temp, strnlen(temp, sizeof(temp)));
+		snprintf(temp, strlen(temp), "NG");
+		sec_cmd_set_cmd_result(sec, temp, strnlen(temp, strlen(temp)));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
 
 	for (ii = 0; ii < (info->SenseChannelLength * info->ForceChannelLength); ii++) {
 		if (ii < (info->ForceChannelLength - 1) * info->SenseChannelLength) {
-			snprintf(temp, sizeof(temp), "%d,",
+			snprintf(temp, strlen(temp), "%d,",
 					(int)abs(info->cx_data[ii + info->SenseChannelLength] - info->cx_data[ii]));
-			strncat(buff, temp, sizeof(temp));
+			strncat(buff, temp, strlen(temp));
 			memset(temp, 0x00, 5);
 		}
 	}
@@ -3134,8 +3134,8 @@ static void run_key_cx_data_read(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3176,12 +3176,12 @@ static void run_key_cx_data_read(void *device_data)
 	total_cx_data[0] = key_cx1_data * 2 + key_cx2_data[0];
 	total_cx_data[1] = key_cx1_data * 2 + key_cx2_data[1];
 
-	//snprintf(buff, sizeof(buff), "%s", "OK");
-	snprintf(buff, sizeof(buff), "%d,%d,%d,%d",
+	//snprintf(buff, strlen(buff) , "%s", "OK");
+	snprintf(buff, strlen(buff) , "%d,%d,%d,%d",
 			key_cx2_data[0], key_cx2_data[1], total_cx_data[0], total_cx_data[1]);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 #endif
@@ -3198,14 +3198,14 @@ static void run_force_pressure_calibration(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_info(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	if (info->touch_count > 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG_FINGER_ON");
+		snprintf(buff, strlen(buff) , "%s", "NG_FINGER_ON");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out_force_pressure_cal;
 	}
@@ -3246,11 +3246,11 @@ static void run_force_pressure_calibration(void *device_data)
 			&info->lowpower_flag, sizeof(info->lowpower_flag));
 #endif
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 out_force_pressure_cal:
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3274,29 +3274,29 @@ static void set_pressure_test_mode(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_info(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		regAdd[3] = sec->cmd_param[0];
 		ret = fts_write_reg(info, regAdd, 4);
 
 		if (ret < 0) {
-			snprintf(buff, sizeof(buff), "NG");
+			snprintf(buff, strlen(buff) , "NG");
 			sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		} else {
-			snprintf(buff, sizeof(buff), "%s", "OK");
+			snprintf(buff, strlen(buff) , "%s", "OK");
 			sec->cmd_state = SEC_CMD_STATUS_OK;
 		}
 	}
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3315,8 +3315,8 @@ static void run_pressure_strength_read_all(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3327,8 +3327,8 @@ static void run_pressure_strength_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read pressure strength addr\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3342,8 +3342,8 @@ static void run_pressure_strength_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read pressure strength\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3354,10 +3354,10 @@ static void run_pressure_strength_read_all(void *device_data)
 	for (i = 0; i < PRESSURE_SENSOR_COUNT; i++)
 		value[i] = (short)(data[i * 2 + 1] | (data[i * 2 + 1 + 1] << 8));
 
-	snprintf(buff, sizeof(buff), "%d,%d,%d", value[0], value[1], value[2]);
+	snprintf(buff, strlen(buff) , "%d,%d,%d", value[0], value[1], value[2]);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3376,8 +3376,8 @@ static void run_pressure_rawdata_read_all(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3388,8 +3388,8 @@ static void run_pressure_rawdata_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read pressure rawdata addr\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3403,8 +3403,8 @@ static void run_pressure_rawdata_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read pressure rawdata\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3415,10 +3415,10 @@ static void run_pressure_rawdata_read_all(void *device_data)
 	for (i = 0; i < PRESSURE_SENSOR_COUNT; i++)
 		value[i] = (short)(data[i * 2 + 1] | (data[i * 2 + 1 + 1] << 8));
 
-	snprintf(buff, sizeof(buff), "%d,%d,%d", value[0], value[1], value[2]);
+	snprintf(buff, strlen(buff) , "%d,%d,%d", value[0], value[1], value[2]);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3440,8 +3440,8 @@ static void run_pressure_ix_data_read_all(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3464,8 +3464,8 @@ static void run_pressure_ix_data_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to write pressure ix\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3478,8 +3478,8 @@ static void run_pressure_ix_data_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read ix offset addr\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3497,8 +3497,8 @@ static void run_pressure_ix_data_read_all(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: [ERROR] failed to read ix\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -3511,7 +3511,7 @@ static void run_pressure_ix_data_read_all(void *device_data)
 	for (i = 0; i < PRESSURE_SENSOR_COUNT; i++)
 		value[i] = ((data[FTS_PRESSURE_IX1] * 2) + data[FTS_PRESSIRE_IX2 + i]);
 
-	snprintf(buff, sizeof(buff), "%d,%d,%d", value[0], value[1], value[2]);
+	snprintf(buff, strlen(buff) , "%d,%d,%d", value[0], value[1], value[2]);
 
 	fts_command(info, SENSEON);
 #ifdef FTS_SUPPORT_PRESSURE_SENSOR
@@ -3523,7 +3523,7 @@ static void run_pressure_ix_data_read_all(void *device_data)
 #endif
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3540,8 +3540,8 @@ static void set_pressure_strength(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3552,8 +3552,8 @@ static void set_pressure_strength(void *device_data)
 	if ((sec->cmd_param[0] < 1) || (sec->cmd_param[0] > 4)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3585,8 +3585,8 @@ static void set_pressure_strength(void *device_data)
 
 	ret = fts_write_reg(info, strength, 12);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		fts_command(info, FTS_CMD_SAVE_CX_TUNING);
 		fts_delay(230);
@@ -3624,7 +3624,7 @@ static void set_pressure_strength(void *device_data)
 	fts_set_pressure_calibration_information(info, info->pressure_cal_base, info->pressure_cal_delta);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3641,8 +3641,8 @@ static void set_pressure_rawdata(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3653,8 +3653,8 @@ static void set_pressure_rawdata(void *device_data)
 	if ((sec->cmd_param[0] < 1) || (sec->cmd_param[0] > 4)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3686,8 +3686,8 @@ static void set_pressure_rawdata(void *device_data)
 
 	ret = fts_write_reg(info, rawdata, 12);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		fts_command(info, FTS_CMD_SAVE_CX_TUNING);
 		fts_delay(230);
@@ -3713,7 +3713,7 @@ static void set_pressure_rawdata(void *device_data)
 	fts_command(info, FTS_CMD_PRESSURE_SENSE_ON);
 #endif
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3730,8 +3730,8 @@ static void set_pressure_data_index(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3742,8 +3742,8 @@ static void set_pressure_data_index(void *device_data)
 	if ((sec->cmd_param[0] < 0) || (sec->cmd_param[0] > 4)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3771,8 +3771,8 @@ static void set_pressure_data_index(void *device_data)
 
 	ret = fts_write_reg(info, data, 4);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 		if (index != 0x00) {
@@ -3804,7 +3804,7 @@ static void set_pressure_data_index(void *device_data)
 #endif
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3822,8 +3822,8 @@ static void get_pressure_strength(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3834,8 +3834,8 @@ static void get_pressure_strength(void *device_data)
 	if ((sec->cmd_param[0] < 1) || (sec->cmd_param[0] > 4)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3844,8 +3844,8 @@ static void get_pressure_strength(void *device_data)
 
 	data = kzalloc(nvm_data[PRESSURE_STRENGTH].length, GFP_KERNEL);
 	if (!data) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		input_err(true, &info->client->dev, "%s: failed to alloc mem\n",
 				__func__);
@@ -3854,8 +3854,8 @@ static void get_pressure_strength(void *device_data)
 
 	ret = get_nvm_data(info, PRESSURE_STRENGTH, data);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		kfree(data);
 		return;
@@ -3870,12 +3870,12 @@ static void get_pressure_strength(void *device_data)
 	strength[1] = (short)(data[index * 8 + 2] | ((data[index * 8 + 3] << 8) & 0xFF00));
 	strength[2] = (short)(data[index * 8 + 4] | ((data[index * 8 + 5] << 8) & 0xFF00));
 
-	snprintf(buff, sizeof(buff), "%d,%d,%d", strength[0], strength[1], strength[2]);
+	snprintf(buff, strlen(buff) , "%d,%d,%d", strength[0], strength[1], strength[2]);
 
 	kfree(data);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3893,8 +3893,8 @@ static void get_pressure_rawdata(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3905,8 +3905,8 @@ static void get_pressure_rawdata(void *device_data)
 	if ((sec->cmd_param[0] < 1) || (sec->cmd_param[0] > 4)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3915,8 +3915,8 @@ static void get_pressure_rawdata(void *device_data)
 
 	data = kzalloc(nvm_data[PRESSURE_RAWDATA].length, GFP_KERNEL);
 	if (!data) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		input_err(true, &info->client->dev, "%s: failed to alloc mem\n",
 				__func__);
@@ -3925,8 +3925,8 @@ static void get_pressure_rawdata(void *device_data)
 
 	ret = get_nvm_data(info, PRESSURE_RAWDATA, data);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		kfree(data);
 		return;
@@ -3941,12 +3941,12 @@ static void get_pressure_rawdata(void *device_data)
 	rawdata[1] = (short)(data[index * 8 + 2] | ((data[index * 8 + 3] << 8) & 0xFF00));
 	rawdata[2] = (short)(data[index * 8 + 4] | ((data[index * 8 + 5] << 8) & 0xFF00));
 
-	snprintf(buff, sizeof(buff), "%d,%d,%d", rawdata[0], rawdata[1], rawdata[2]);
+	snprintf(buff, strlen(buff) , "%d,%d,%d", rawdata[0], rawdata[1], rawdata[2]);
 
 	kfree(data);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -3963,8 +3963,8 @@ static void get_pressure_data_index(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -3974,8 +3974,8 @@ static void get_pressure_data_index(void *device_data)
 
 	data = kzalloc(nvm_data[GROUP_INDEX].length, GFP_KERNEL);
 	if (!data) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		input_err(true, &info->client->dev, "%s: failed to alloc mem\n",
 				__func__);
@@ -3984,8 +3984,8 @@ static void get_pressure_data_index(void *device_data)
 
 	ret = get_nvm_data(info, GROUP_INDEX, data);
 	if (ret <= 0) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		kfree(data);
 		return;
@@ -3996,12 +3996,12 @@ static void get_pressure_data_index(void *device_data)
 		data[0] = 0;
 	}
 
-	snprintf(buff, sizeof(buff), "%d", data[0]);
+	snprintf(buff, strlen(buff) , "%d", data[0]);
 
 	kfree(data);
 
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -4019,8 +4019,8 @@ static void set_pressure_strength_clear(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4082,16 +4082,16 @@ static void set_pressure_strength_clear(void *device_data)
 	fts_command(info, FTS_CMD_PRESSURE_SENSE_ON);
 #endif
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%s", "OK");
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 
 	return;
 
 err_write_reg:
-	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%s", "NG");
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	fts_command(info, FTS_CMD_SAVE_CX_TUNING);
 	fts_delay(230);
@@ -4118,8 +4118,8 @@ static void get_pressure_threshold(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4128,9 +4128,9 @@ static void get_pressure_threshold(void *device_data)
 	if (ret < 0)
 		input_err(true, &info->client->dev, "%s: failed to read pressure threshold\n", __func__);
 
-	snprintf(buff, sizeof(buff), "%d", ((data[2] << 8) + data[1]));
+	snprintf(buff, strlen(buff) , "%d", ((data[2] << 8) + data[1]));
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -4149,8 +4149,8 @@ static void set_pressure_user_level(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4158,8 +4158,8 @@ static void set_pressure_user_level(void *device_data)
 	if ((sec->cmd_param[0] < 1) || (sec->cmd_param[0] > 5)) {
 		input_err(true, &info->client->dev, "%s: wrong index.\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "WRONG INDEX");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "WRONG INDEX");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4194,17 +4194,17 @@ static void set_pressure_user_level(void *device_data)
 
 	input_info(true, &info->client->dev, "%s: HIGH LOW: %d\n", __func__, data[0]);
 
-	snprintf(buff, sizeof(buff), "OK");
+	snprintf(buff, strlen(buff) , "OK");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 	return;
 
 out_set_user_level:
-	snprintf(buff, sizeof(buff), "FAIL");
+	snprintf(buff, strlen(buff) , "FAIL");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -4233,17 +4233,17 @@ static void get_pressure_user_level(void *device_data)
 
 	info->pressure_user_level = data[0];
 
-	snprintf(buff, sizeof(buff), "%d", info->pressure_user_level);
+	snprintf(buff, strlen(buff) , "%d", info->pressure_user_level);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 	return;
 
 out_get_user_level:
-	snprintf(buff, sizeof(buff), "NG");
+	snprintf(buff, strlen(buff) , "NG");
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
@@ -4267,8 +4267,8 @@ static void factory_cmd_result_all(void *device_data)
 
 	sec->cmd_all_factory_state = SEC_CMD_STATUS_RUNNING;
 
-	snprintf(buff, sizeof(buff), "%d", info->board->item_version);
-	sec_cmd_set_cmd_result_all(sec, buff, sizeof(buff), "ITEM_VERSION");
+	snprintf(buff, strlen(buff) , "%d", info->board->item_version);
+	sec_cmd_set_cmd_result_all(sec, buff, strlen(buff) , "ITEM_VERSION");
 
 	get_chip_vendor(sec);
 	get_chip_name(sec);
@@ -4334,15 +4334,15 @@ static void set_factory_level(void *device_data)
 	info->factory_position = sec->cmd_param[0];
 
 	input_info(true, &info->client->dev, "%s: %d\n", __func__, info->factory_position);
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	return;
 
 NG:
-	snprintf(buff, sizeof(buff), "%s", "NG");
+	snprintf(buff, strlen(buff) , "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 }
 
 int fts_get_tsp_test_result(struct fts_ts_info *info)
@@ -4376,8 +4376,8 @@ static void get_tsp_test_result(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4386,11 +4386,11 @@ static void get_tsp_test_result(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: get failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
-		snprintf(buff, sizeof(buff), "M:%s, M:%d, A:%s, A:%d",
+		snprintf(buff, strlen(buff) , "M:%s, M:%d, A:%s, A:%d",
 				info->test_result.module_result == 0 ? "NONE" :
 				info->test_result.module_result == 1 ? "FAIL" :
 				info->test_result.module_result == 2 ? "PASS" : "A",
@@ -4423,8 +4423,8 @@ static void set_tsp_test_result(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4433,8 +4433,8 @@ static void set_tsp_test_result(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: get failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -4466,14 +4466,14 @@ static void set_tsp_test_result(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: set failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -4507,8 +4507,8 @@ static void increase_disassemble_count(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4517,8 +4517,8 @@ static void increase_disassemble_count(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: get failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		return;
 	}
@@ -4531,14 +4531,14 @@ static void increase_disassemble_count(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: set failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
 
@@ -4554,8 +4554,8 @@ static void get_disassemble_count(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		return;
 	}
@@ -4564,11 +4564,11 @@ static void get_disassemble_count(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: get failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "NG");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
-		snprintf(buff, sizeof(buff), "%d", info->disassemble_count);
+		snprintf(buff, strlen(buff) , "%d", info->disassemble_count);
 
 		sec_cmd_set_cmd_result(sec, buff, strlen(buff));
 		sec->cmd_state = SEC_CMD_STATUS_OK;
@@ -4842,7 +4842,7 @@ static void glove_mode(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		info->glove_enabled = sec->cmd_param[0];
@@ -4861,10 +4861,10 @@ static void glove_mode(void *device_data)
 		regAdd[2] = (u8)(info->touch_functions >> 8);
 		fts_write_reg(info, &regAdd[0], 3);
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
 
@@ -4884,15 +4884,15 @@ static void get_glove_sensitivity(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		sec_cmd_set_cmd_exit(sec);
 		return;
 	}
 
 	// need to add
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
@@ -4909,7 +4909,7 @@ static void clear_cover_mode(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 3) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		if (sec->cmd_param[0] > 1) {
@@ -4942,10 +4942,10 @@ static void clear_cover_mode(void *device_data)
 				fts_set_cover_type(info, false);
 		}
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
 
@@ -4964,24 +4964,24 @@ static void report_rate(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 255) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 
 		scan_rate = sec->cmd_param[0];
 		fts_change_scan_rate(info, scan_rate);
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 
 out:
@@ -5002,14 +5002,14 @@ static void interrupt_control(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		int enables = sec->cmd_param[0];
@@ -5019,10 +5019,10 @@ static void interrupt_control(void *device_data)
 		else
 			fts_irq_enable(info, false);
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 
 out:
@@ -5045,24 +5045,24 @@ static void set_wirelesscharger_mode(void *device_data)
 
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 3) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		info->charger_mode = sec->cmd_param[0];
 
 		fts_wirelesscharger_mode(info);
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 
 out:
@@ -5211,7 +5211,7 @@ static void set_grip_data(void *device_data)
 
 	sec_cmd_set_default_result(sec);
 
-	memset(buff, 0, sizeof(buff));
+	memset(buff, 0, strlen(buff) );
 
 	mutex_lock(&info->device_mutex);
 
@@ -5269,18 +5269,18 @@ static void set_grip_data(void *device_data)
 
 	mutex_unlock(&info->device_mutex);
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 	return;
 
 err_grip_data:
 	mutex_unlock(&info->device_mutex);
 
-	snprintf(buff, sizeof(buff), "%s", "NG");
+	snprintf(buff, strlen(buff) , "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 }
 
@@ -5295,7 +5295,7 @@ static void dead_zone_enable(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
 		if (sec->cmd_param[0] == 0)
@@ -5309,10 +5309,10 @@ static void dead_zone_enable(void *device_data)
 		else
 			input_info(true, &info->client->dev, "%s: reg:%d, ret: %d\n", __func__, sec->cmd_param[0], ret);
 
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
@@ -5341,16 +5341,16 @@ static void drawing_test_enable(void *device_data)
 #endif
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 		goto out;
 	}
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 out:
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
@@ -5380,16 +5380,16 @@ static void spay_enable(void *device_data)
 #endif
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 
 		goto out;
 	}
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 out:
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
@@ -5419,16 +5419,16 @@ static void aot_enable(void *device_data)
 			&info->lowpower_flag, sizeof(info->lowpower_flag));
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec_cmd_set_cmd_exit(sec);
 		return;
 	}
 #endif
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 	input_info(true, &info->client->dev, "%s: %d\n", __func__, sec->cmd_param[0]);
 }
@@ -5454,16 +5454,16 @@ static void aod_enable(void *device_data)
 			&info->lowpower_flag, sizeof(info->lowpower_flag));
 	if (ret < 0) {
 		input_err(true, &info->client->dev, "%s: failed. ret: %d\n", __func__, ret);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec_cmd_set_cmd_exit(sec);
 		return;
 	}
 #endif
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 	input_info(true, &info->client->dev, "%s: %d\n", __func__, sec->cmd_param[0]);
 }
@@ -5498,16 +5498,16 @@ static void set_aod_rect(void *device_data)
 		goto NG;
 	}
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 	return;
 NG:
 
-	snprintf(buff, sizeof(buff), "%s", "NG");
+	snprintf(buff, strlen(buff) , "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 }
 
@@ -5538,15 +5538,15 @@ static void get_aod_rect(void *device_data)
 			__func__, rect_data[0], rect_data[1], rect_data[2], rect_data[3]);
 #endif
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 	return;
 NG:
-	snprintf(buff, sizeof(buff), "%s", "NG");
+	snprintf(buff, strlen(buff) , "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 }
 
@@ -5608,15 +5608,15 @@ static void dex_enable(void *device_data)
 	else
 		input_info(true, &info->client->dev, "%s: reg:%d, ret: %d\n", __func__, regAdd[2], ret);
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%s", "OK");
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 	sec_cmd_set_cmd_exit(sec);
 	return;
 
 out:
-	snprintf(buff, sizeof(buff), "%s", "NG");
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	snprintf(buff, strlen(buff) , "%s", "NG");
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	sec_cmd_set_cmd_exit(sec);
 }
@@ -5632,7 +5632,7 @@ static void brush_enable(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -5642,8 +5642,8 @@ static void brush_enable(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
@@ -5660,16 +5660,16 @@ static void brush_enable(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: failed to set brush mode\n", __func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 out:
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
@@ -5686,7 +5686,7 @@ static void set_touchable_area(void *device_data)
 	sec_cmd_set_default_result(sec);
 
 	if (sec->cmd_param[0] < 0 || sec->cmd_param[0] > 1) {
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
@@ -5696,7 +5696,7 @@ static void set_touchable_area(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 		goto out;
 	}
@@ -5713,16 +5713,16 @@ static void set_touchable_area(void *device_data)
 	if (ret < 0) {
 		input_err(true, &info->client->dev,
 				"%s: failed to set 16:9 mode\n", __func__);
-		snprintf(buff, sizeof(buff), "%s", "NG");
+		snprintf(buff, strlen(buff) , "%s", "NG");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 		goto out;
 	}
 
-	snprintf(buff, sizeof(buff), "%s", "OK");
+	snprintf(buff, strlen(buff) , "%s", "OK");
 	sec->cmd_state = SEC_CMD_STATUS_OK;
 
 out:
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 	sec_cmd_set_cmd_exit(sec);
 
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
@@ -5739,9 +5739,9 @@ static void delay(void *device_data)
 	info->delay_time = sec->cmd_param[0];
 
 	input_info(true, &info->client->dev, "%s time is %d\n", __func__, info->delay_time);
-	snprintf(buff, sizeof(buff), "%d", info->delay_time);
+	snprintf(buff, strlen(buff) , "%d", info->delay_time);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
@@ -5761,7 +5761,7 @@ static void debug(void *device_data)
 
 	input_info(true, &info->client->dev, "%s: command is %d\n", __func__, info->debug_string);
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 	sec->cmd_state = SEC_CMD_STATUS_WAITING;
 	sec_cmd_set_cmd_exit(sec);
@@ -5781,8 +5781,8 @@ static void run_force_calibration(void *device_data)
 	if (info->fts_power_state == FTS_POWER_STATE_POWERDOWN) {
 		input_err(true, &info->client->dev, "%s: [ERROR] Touch is stopped\n",
 				__func__);
-		snprintf(buff, sizeof(buff), "%s", "TSP turned off");
-		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+		snprintf(buff, strlen(buff) , "%s", "TSP turned off");
+		sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 		sec->cmd_state = SEC_CMD_STATUS_NOT_APPLICABLE;
 #ifdef TCLM_CONCEPT
 		info->tdata->external_factory = false;
@@ -5840,14 +5840,14 @@ static void run_force_calibration(void *device_data)
 	fts_set_scanmode(info, info->scan_mode);
 
 	if (touch_on) {
-		snprintf(buff, sizeof(buff), "NG_FINGER_ON");
+		snprintf(buff, strlen(buff) , "NG_FINGER_ON");
 		sec->cmd_state = SEC_CMD_STATUS_FAIL;
 	} else {
-		snprintf(buff, sizeof(buff), "%s", "OK");
+		snprintf(buff, strlen(buff) , "%s", "OK");
 		sec->cmd_state = SEC_CMD_STATUS_OK;
 	}
 
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 #ifdef TCLM_CONCEPT
 	info->tdata->external_factory = false;
 #endif
@@ -5860,9 +5860,9 @@ autotune_fail:
 	info->tdata->external_factory = false;
 #endif
 	fts_interrupt_set(info, INT_ENABLE);
-	snprintf(buff, sizeof(buff), "%s", "NG");
+	snprintf(buff, strlen(buff) , "%s", "NG");
 	sec->cmd_state = SEC_CMD_STATUS_FAIL;
-	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, sizeof(buff)));
+	sec_cmd_set_cmd_result(sec, buff, strnlen(buff, strlen(buff) ));
 
 	input_info(true, &info->client->dev, "%s: %s\n", __func__, buff);
 }
